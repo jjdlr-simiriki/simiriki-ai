@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Script from 'next/script';
+import ChatWidget from "./components/ChatWidget";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,19 +20,7 @@ export default function RootLayout({
     <html lang="en">
           <body className={inter.className}>
         {children}
-        <Script id="simiriki-chat-config" strategy="afterInteractive">
-          {`
-            window.ChatGPTConfig = {
-              token: "<INSERT_OPENAI_CHAT_WIDGET_TOKEN_HERE>",
-              containerId: "simirikiChatWidget",
-              welcomeMessage: "Hola 👋 ¿En qué puedo ayudarte con la automatización de tu negocio?",
-              theme: "light"
-            };
-          `}
-        </Script>
-        <Script
-          src="https://cdn.simiriki.com/widgets/chatgpt.js"
-          strategy="afterInteractive"
+        <ChatWidget />
         />
       </body>
     </html>
