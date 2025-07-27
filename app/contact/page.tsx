@@ -23,9 +23,7 @@ export default function ContactPage() {
   }, []);
 
   return (
-    <div className="container mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-4">Contáctanos</h1>
-<div
+   v
             {/* 🔎 Call to Action Block */}
       <div className="mt-12 p-8 bg-gray-100 rounded-xl text-center shadow-lg">
         <h2 className="text-2xl font-semibold mb-2">¿Quieres ir más allá?</h2>
