@@ -23,7 +23,7 @@ export default function ContactPage() {
   }, []);
 
   return (
-   v
+v
             {/* 🔎 Call to Action Block */}
       <div className="mt-12 p-8 bg-gray-100 rounded-xl text-center shadow-lg">
         <h2 className="text-2xl font-semibold mb-2">¿Quieres ir más allá?</h2>
