@@ -41,8 +41,5 @@ jobs:
           action: "upload"
           app_location: "/"
           
-          output_location:
-           
-         
-
-    skip_deploy_on_missing_secrets: true
+          output_location: "build"
+     
