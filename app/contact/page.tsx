@@ -6,12 +6,14 @@ export default function ContactPage() {
       <iframe
         width="640"
         height="480"
-        src="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=OZGKeqaG2kK6p0k_H5TL1tS7AKPABW1Cjl54mHKESRdUNk5TWUpSQzBNVjJIOVNRNkdKR0VRR0c2VC4u&embed=true"
-        frameBorder="0"
-        marginWidth="0"
-        marginHeight="0"
-        style={{ border: 'none', maxWidth: '100%', maxHeight: '100vh' }}
-        allowFullScreen
+        <iframe
+  src="https://forms.office.com/Pages/ResponsePage.aspx?...&embed=true"
+  frameBorder={0}
+  marginWidth={0}
+  marginHeight={0}
+  style=https://operator.chatgpt.com/c/688b904eae988190964ae04c24ed568b#cua_citation-%20border:%20'none',%20maxWidth:%20'100%',%20maxHeight:%20'100vh'%20
+  allowFullScreen
+/>
       ></iframe>
     </div>
   );
