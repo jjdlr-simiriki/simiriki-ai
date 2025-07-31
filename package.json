@@ -14,7 +14,7 @@
     "react-dom": "^18",
     "next": "14.1.0",
     "puppeteer": "^21.0.0"  
-  }
+  },
   "devDependencies": {
     "typescript": "^5",
     "@types/node": "^20",
