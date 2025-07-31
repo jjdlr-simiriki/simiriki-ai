@@ -1,0 +1,15 @@
+name: Smoke Test
+
+on:
+  workflow_run:
+    workflows: ["Azure Static Web Apps CI/CD"]
+    types:
+      - completed
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit Home Page
+        run: |
+          curl -s https://simiriki.azurestaticapps.net | grep -q "Welcome to Simiriki"
