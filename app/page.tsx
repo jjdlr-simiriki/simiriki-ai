@@ -1,30 +1,26 @@
-'use client';
+import Image from 'next/image';
+import FAQ from '@/components/FAQ';
 
-import { useEffect } from 'react';
-
-export default function ContactPage() {
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = '//js.hsforms.net/forms/embed/v2.js';
-    script.type = 'text/javascript';
-    script.charset = 'utf-8';
-    document.body.appendChild(script);
-    script.onload = () => {
-      if ((window as any).hbspt) {
-        (window as any).hbspt.forms.create({
-          region: 'na1',
-          portalId: '50203146',
-          formId: '5d6f2da9-be4d-451c-8ed4-5f051b68d071',
-          target: '#hubspotForm'
-        });
-      }
-    };
-  }, []);
-
+export default function Home() {
   return (
-    <main className="container mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-4">Contáctanos</h1>
-      <div id="hubspotForm"></div>
+    <main className="mx-auto max-w-7xl p-6">
+      <section className="text-center py-20">
+        <h1 className="text-5xl font-bold">Welcome to Simiriki</h1>
+        <p className="mt-4 text-xl">Your guide to smarter decisions.</p>
+      </section>
+
+      <FAQ />
+
+      {/* Microsoft Forms iframe */}
+      <section id="contact" className="py-20">
+        <iframe
+          src="https://forms.office.com/Pages/ResponsePage.aspx?..." // TODO: replace with live URL
+          width="100%"
+          height="600"
+          style={{ border: 'none' }}
+          title="Simiriki Contact Form"
+        />
+      </section>
     </main>
   );
 }
