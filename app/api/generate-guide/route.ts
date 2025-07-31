@@ -16,11 +16,14 @@ export async function POST(req: NextRequest) {
   const pdfBuffer = await page.pdf({ format: 'A4' });
   await browser.close();
 
-  return new Response(pdfBuffer, {
+  // Convert Buffer to Uint8Array for Response body
+  const pdfArray = new Uint8Array(pdfBuffer);
+
+  return new Response(pdfArray, {
     headers: {
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'attachment; filename=simiriki-guide.pdf',
-    },
-  });
+  },
+});
 }
 
