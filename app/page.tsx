@@ -13,7 +13,7 @@ export default function Home() {
       {/* Microsoft Forms iframe */}
       <section id="contact" className="py-20">
         <iframe
-          src={process.env.NEXT_PUBLIC_CONTACT_FORM_URL || ''}
+          src={process.env.NEXT_PUBLIC_CONTACT_FORM_URL}
           width="100%"
           height="600"
           style={{ border: 'none' }}
