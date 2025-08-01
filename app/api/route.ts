@@ -4,6 +4,7 @@ import puppeteer from 'puppeteer';
 export async function GET(req: NextRequest) {
   const browser = await puppeteer.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    // use boolean value because 'new' is not recognized by Puppeteer types
     headless: true
   });
   const page = await browser.newPage();
