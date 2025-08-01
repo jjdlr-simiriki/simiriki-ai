@@ -28,3 +28,12 @@ This starter application uses Next.js and React Server Components. By default, a
 > e to the *out* folder, and start the CLI from the *out* folder.
 
 <!-- trigger deployment -->
+
+## Configuration
+
+Create a `.env.local` file based on the provided `.env.example` and supply the
+required values.
+
+- `OPENAI_API_KEY` &ndash; API key used by the assistant API routes.
+- `NEXT_PUBLIC_CONTACT_FORM_URL` &ndash; URL of the embedded contact form used on
+  the home and contact pages.

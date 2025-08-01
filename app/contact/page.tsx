@@ -4,7 +4,7 @@ export default function ContactPage() {
   return (
     <div className="container mx-auto py-8">
       <iframe
-        src="https://forms.office.com/Pages/ResponsePage.aspx?...&embed=true"
+        src={process.env.NEXT_PUBLIC_CONTACT_FORM_URL || ''}
         frameBorder={0}
         marginWidth={0}
         marginHeight={0}
