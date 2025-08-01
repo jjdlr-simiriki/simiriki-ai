@@ -1,4 +1,4 @@
-// DONE: Basic PDF generation implemented. Template injection & design pending.
+// Basic PDF generation implemented. Template injection & design pending.
 
 
 import { NextRequest } from 'next/server';
