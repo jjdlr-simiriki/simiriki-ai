@@ -1,5 +1,4 @@
-import Image from 'next/image';
-import FAQ from '@/components/FAQ';
+import FAQ from './components/FAQ';
 
 export default function Home() {
   return (
@@ -14,7 +13,7 @@ export default function Home() {
       {/* Microsoft Forms iframe */}
       <section id="contact" className="py-20">
         <iframe
-          src="https://forms.office.com/Pages/ResponsePage.aspx?..." // TODO: replace with live URL
+          src="https://forms.office.com/Pages/ResponsePage.aspx?..." // TODO: replace
           width="100%"
           height="600"
           style={{ border: 'none' }}
