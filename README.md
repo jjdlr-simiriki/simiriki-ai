@@ -28,3 +28,19 @@ This starter application uses Next.js and React Server Components. By default, a
 > e to the *out* folder, and start the CLI from the *out* folder.
 
 <!-- trigger deployment -->
+
+## Codex environment setup
+
+The project may be executed in OpenAI's Codex environment, which does not have
+network access unless explicitly enabled. If `npm install` fails or `npm run lint`
+complains about missing dependencies, enable internet access or run a setup
+script while connectivity is allowed. A basic setup script (`setup.sh`) is:
+
+```bash
+#!/bin/bash
+npm ci
+pip install PyGithub
+```
+
+Run this script before executing any build or test commands so that the required
+Node and Python packages are available.
