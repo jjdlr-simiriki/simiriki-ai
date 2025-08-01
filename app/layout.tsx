@@ -4,6 +4,7 @@ import "./globals.css";
 import ChatWidget from "./components/ChatWidget";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { ReactNode } from "react";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <html lang="en">
