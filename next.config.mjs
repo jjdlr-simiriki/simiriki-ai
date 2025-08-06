@@ -1,9 +1,8 @@
-import { defineConfig } from "next";
-
-export default defineConfig({
+/** @type {import('next').NextConfig} */
+export default {
   experimental: {
     appDir: true,
-    optimizeFonts: false,      // ← turn off the CJS-based font optimizer
-    esmExternals: "loose",     // ← allow any remaining CJS deps
+    optimizeFonts: false,      // disable the CJS font optimizer
+    esmExternals: "loose",     // allow CommonJS deps at runtime
   },
-});
+};
