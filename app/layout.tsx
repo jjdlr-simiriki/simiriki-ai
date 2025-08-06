@@ -1,12 +1,5 @@
 // app/layout.tsx
 import { ReactNode } from "react";
-import { Roboto } from "next/font/google";
-// ✅ ES-module import of your font
-const roboto = Roboto({
-  weight: ["400", "700"],
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const metadata = {
   title: "Simiriki",
@@ -16,7 +9,20 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es">
-      <body className={roboto.className}>
+      <head>
+        {/* Load Google Fonts via <link> instead of next/font */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body style={{ fontFamily: "Roboto, sans-serif" }}>
         {children}
       </body>
     </html>
