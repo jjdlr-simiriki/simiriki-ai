@@ -1,29 +1,23 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import ChatWidget from "./components/ChatWidget";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+// app/layout.tsx
+import { ReactNode } from "react";
+import { Roboto } from "next/font/google";
+// ✅ ES-module import of your font
+const roboto = Roboto({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  display: "swap",
+});
 
-const inter = Inter({ subsets: ["latin"], display: "swap" });
-
-export const metadata: Metadata = {
-  title: "Simiriki | AI Solutions",
-  description: "AI-powered solutions by Simiriki",
+export const metadata = {
+  title: "Simiriki",
+  description: "Automatiza. Escala. Transforma.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Header />
+    <html lang="es">
+      <body className={roboto.className}>
         {children}
-        <Footer />
-        <ChatWidget />
       </body>
     </html>
   );
