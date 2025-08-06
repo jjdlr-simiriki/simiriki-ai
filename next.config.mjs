@@ -3,7 +3,7 @@ import { defineConfig } from "next";
 export default defineConfig({
   experimental: {
     appDir: true,
-    // Allow CJS modules (like font-loader internals) in ESM scope:
-    esmExternals: "loose",
+    optimizeFonts: false,      // ← turn off the CJS-based font optimizer
+    esmExternals: "loose",     // ← allow any remaining CJS deps
   },
 });
