@@ -1,6 +1,9 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  output: 'export'
-};
+import { defineConfig } from "next";
 
-export default nextConfig;
+export default defineConfig({
+  experimental: {
+    appDir: true,
+    // Allow CJS modules (like font-loader internals) in ESM scope:
+    esmExternals: "loose",
+  },
+});
