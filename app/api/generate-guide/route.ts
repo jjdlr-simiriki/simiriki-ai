@@ -22,8 +22,9 @@ export async function POST(req: NextRequest) {
   return new Response(pdfArray, {
     headers: {
       'Content-Type': 'application/pdf',
-      'Content-Disposition': 'attachment; filename=simiriki-guide.pdf',
-  },
-});
+      'Content-Disposition':
+        'attachment; filename=simiriki-guide.pdf',
+    },
+  });
 }
 
