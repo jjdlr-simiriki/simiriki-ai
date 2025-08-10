@@ -4,11 +4,19 @@
 
 ## Running locally
 
-To run locally, start by installing the Node dependencies. 
+To run locally, start by installing the Node dependencies.
 
 ```bash
 npm install
 ```
+
+Copy the sample environment file and fill in the required variables for local development:
+
+```bash
+cp .env.example .env.local
+# edit .env.local and set OPENAI_API_KEY
+```
+The `.env.local` file is ignored by Git so your API key won't be committed.
 
 Start the development server with the following command:
 
