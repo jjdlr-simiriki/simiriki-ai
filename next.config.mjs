@@ -1,6 +1,5 @@
-// next.config.mjs
-import pkg from 'next';
-const { defineConfig } = pkg;
+/** @type {import('next').NextConfig} */
+const nextConfig = {};
 
-export default defineConfig({});
+export default nextConfig;
 
