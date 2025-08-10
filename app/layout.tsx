@@ -1,5 +1,6 @@
 // app/layout.tsx
 import { ReactNode } from "react";
+import "./globals.css";
 
 export const metadata = {
   title: "Simiriki",
