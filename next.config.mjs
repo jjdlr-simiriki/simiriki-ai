@@ -1,6 +1,14 @@
 // next.config.mjs
-import pkg from 'next';
-const { defineConfig } = pkg;
+const nextConfig = {
+  output: 'export',
+  trailingSlash: true,
+  images: {
+    unoptimized: true
+  },
+  experimental: {
+    generateStaticParams: false
+  }
+};
 
-export default defineConfig({});
+export default nextConfig;
 
