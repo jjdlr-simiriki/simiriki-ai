@@ -1,4 +1,3 @@
-// DONE: Basic PDF generation implemented. Template injection & design pending.
 import { NextRequest } from 'next/server';
 import puppeteer from 'puppeteer';
 
@@ -24,4 +23,3 @@ export async function POST(req: NextRequest) {
     },
   });
 }
-
