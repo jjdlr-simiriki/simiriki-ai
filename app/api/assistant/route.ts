@@ -1,5 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+type RunStatus = 'queued' | 'in_progress' | 'completed' | 'failed' | string;
+
+interface ThreadResponse {
+  id: string;
+}
+
+interface RunResponse {
+  id: string;
+  status: RunStatus;
+}
+
+interface MessageContent {
+  text?: string;
+  [key: string]: unknown;
+}
+
+interface ThreadMessage {
+  role: 'assistant' | 'user' | 'system';
+  content: MessageContent[];
+}
+
+interface MessagesResponse {
+  data: ThreadMessage[];
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { message } = await req.json();
@@ -31,7 +56,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: err }, { status: 500 });
     }
 
-    const thread = await threadRes.json();
+    const thread: ThreadResponse = await threadRes.json();
     const threadId = thread.id;
 
     // 2. Add user message
@@ -61,11 +86,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: err }, { status: 500 });
     }
 
-    const run = await runRes.json();
+    const run: RunResponse = await runRes.json();
     const runId = run.id;
 
     // 4. Poll for completion
-    let status = run.status;
+    let status: RunStatus = run.status;
     while (status === 'queued' || status === 'in_progress') {
       await new Promise((res) => setTimeout(res, 1500));
       const runStatusRes = await fetch(
@@ -77,7 +102,7 @@ export async function POST(req: NextRequest) {
           },
         }
       );
-      const runStatus = await runStatusRes.json();
+      const runStatus: RunResponse = await runStatusRes.json();
       status = runStatus.status;
     }
 
@@ -96,13 +121,15 @@ export async function POST(req: NextRequest) {
       }
     );
 
-    const messagesData = await messagesRes.json();
-    const assistantReply = messagesData.data
-      .filter((m: any) => m.role === 'assistant')
-      .pop()?.content?.[0]?.text ?? '';
+    const messagesData: MessagesResponse = await messagesRes.json();
+    const assistantReply =
+      messagesData.data
+        .filter((m) => m.role === 'assistant')
+        .pop()?.content?.[0]?.text ?? '';
 
     return NextResponse.json({ reply: assistantReply });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Unexpected error' }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unexpected error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

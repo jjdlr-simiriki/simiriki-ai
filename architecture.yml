@@ -1,0 +1,6 @@
+# Recommended System Architecture
+
+simiriki-landing:
+  purpose: "Customer acquisition"
+  connects_to:
+    - simiriki-ai (for demos)
