@@ -13,7 +13,6 @@ interface RunResponse {
 
 interface MessageContent {
   text?: string;
-  [key: string]: unknown;
 }
 
 interface ThreadMessage {
