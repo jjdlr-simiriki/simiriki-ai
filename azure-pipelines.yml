@@ -10,7 +10,6 @@ pr:
       - main
 
 variables:
-  - group: simiriki-ai
 
 pool:
   vmImage: 'ubuntu-latest'
