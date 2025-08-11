@@ -1,0 +1,58 @@
+name: CI Self-Heal on Failure
+
+on:
+  workflow_run:
+    workflows:
+      - Continuous Lighthouse Audit & Auto-Remediation
+    types:
+      - completed
+
+jobs:
+  heal:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download Lighthouse JSON artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: lhr-report
+          path: lhr/
+
+      - name: Generate Healing Patch
+        id: heal
+        uses: peter-evans/openai-actions@v2
+        with:
+          prompt: |
+            CI failed. Here is the Lighthouse report JSON:
+            ```json
+            ${{ steps.download-artifact.outputs['lhr-report/report.json'] }}
+            ```
+            And here are the last 200 lines of the build log:
+            ```bash
+            tail -n 200 $GITHUB_WORKSPACE/lhr/report.json
+            ```
+            Analyze both and output a unified-diff patch to fix the failure.
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Apply & Push Healing Patch
+        if: ${{ steps.heal.outputs.diff }}
+        run: |
+          echo "${{ steps.heal.outputs.diff }}" > heal.patch
+          git checkout -b ci-heal-$(date +%Y%m%d%H%M)
+          git apply heal.patch
+          git commit -am "chore(ci): self-heal CI failure"
+          git push origin HEAD
+
+      - name: Create Healing Pull Request
+        if: ${{ steps.heal.outputs.diff }}
+        uses: peter-evans/create-pull-request@v4
+        with:
+          branch: ci-heal-$(date +%Y%m%d%H%M)
+          title: "🤖 CI Self-Heal: Auto-patch for failure #${{ github.event.workflow_run.run_number }}"
+          body: |
+            This PR contains an automated fix for the failed CI run.
+            Review and merge to restore a green build.

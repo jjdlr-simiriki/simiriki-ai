@@ -1,29 +1,29 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import ChatWidget from "./components/ChatWidget";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+// app/layout.tsx
+import { ReactNode } from "react";
 
-const inter = Inter({ subsets: ["latin"], display: "swap" });
-
-export const metadata: Metadata = {
-  title: "Simiriki | AI Solutions",
-  description: "AI-powered solutions by Simiriki",
+export const metadata = {
+  title: "Simiriki",
+  description: "Automatiza. Escala. Transforma.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Header />
+    <html lang="es">
+      <head>
+        {/* Load Google Fonts via <link> instead of next/font */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body style={{ fontFamily: "Roboto, sans-serif" }}>
         {children}
-        <Footer />
-        <ChatWidget />
       </body>
     </html>
   );

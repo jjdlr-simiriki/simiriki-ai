@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export'
+  reactStrictMode: true,
+  swcMinify: true,
+  // Add other config options as needed
 };
 
 export default nextConfig;

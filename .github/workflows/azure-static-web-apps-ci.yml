@@ -1,0 +1,17 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/**'
+      - 'next.config.mjs'
+      - 'package.json'
+      - 'tsconfig.json'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'app/**'
+      - 'next.config.mjs'
+      - 'package.json'
+      - 'tsconfig.json'

@@ -1,0 +1,71 @@
+name: Continuous Lighthouse Audit & Auto-Remediation
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 02:00 UTC
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install LHCI
+        run: npm install -g @lhci/cli
+
+      - name: Run Lighthouse CI
+        run: |
+          lhci autorun \
+            --upload.target=temporary-public-storage \
+            --settings.emulatedFormFactor=mobile \
+            --settings.throttlingMethod=provided \
+            --assert.alias=performance:50 \
+            --assert.alias=accessibility:80 \
+            --assert.alias=best-practices:80 \
+            --assert.alias=seo:80
+
+      - name: Collect Lighthouse JSON
+        run: |
+          mkdir -p lhr
+          lhci collect --staticDistDir=./out --json > lhr/report.json
+
+      - name: Generate remediation patch with OpenAI
+        id: ai_patch
+        uses: peter-evans/openai-actions@v2
+        with:
+          prompt: |
+            You are an expert web engineer. Here is a Lighthouse JSON report:
+            ```json
+            ${{ steps.collect.outputs['lhr/report.json'] }}
+            ```
+            Identify the top 5 actionable fixes for Performance, Accessibility, Best Practices, and SEO.
+            Output a unified diff patch that:
+            - Converts large images to WebP or adds loading="lazy"
+            - Adds missing alt attributes
+            - Defers non-critical scripts (<script defer>)
+            - Adds meta description and canonical tags
+            - Adjusts CSS for proper contrast
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Apply AI patch
+        if: ${{ steps.ai_patch.outputs.diff }}
+        run: |
+          echo "${{ steps.ai_patch.outputs.diff }}" > ai.patch
+          git checkout -b ai/remediation-$(date +%Y%m%d%H%M)
+          git apply ai.patch
+          git commit -am "chore: automated Lighthouse remediation"
+          git push origin HEAD
+
+      - name: Create Pull Request
+        if: ${{ steps.ai_patch.outputs.diff }}
+        uses: peter-evans/create-pull-request@v4
+        with:
+          branch: ai/remediation-$(date +%Y%m%d%H%M)
+          title: "🔧 Automated Lighthouse Remediation"
+          body: |
+            This PR contains AI-generated fixes for the latest Lighthouse audit.
+            Review, merge, and watch your scores improve! 🚀
