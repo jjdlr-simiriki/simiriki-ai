@@ -4,10 +4,16 @@
 
 ## Running locally
 
-To run locally, start by installing the Node dependencies. 
+To run locally, start by installing the Node dependencies.
 
 ```bash
 npm install
+```
+
+Copy the example environment file and set your environment variables:
+
+```bash
+cp .env.example .env.local
 ```
 
 Start the development server with the following command:
