@@ -1,5 +1,7 @@
 // app/layout.tsx
+import "./globals.css";
 import { ReactNode } from "react";
+import ChatWidget from "./components/ChatWidget";
 
 export const metadata = {
   title: "Simiriki",
@@ -24,6 +26,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body style={{ fontFamily: "Roboto, sans-serif" }}>
         {children}
+        <ChatWidget />
       </body>
     </html>
   );
