@@ -9,7 +9,6 @@
     "export": "next build && next export",
     "start": "next start",
     "lint": "next lint",
-    "test": "node -e \"console.log('No tests specified')\""
   },
   "dependencies": {
     "next": "^15.4.6",
