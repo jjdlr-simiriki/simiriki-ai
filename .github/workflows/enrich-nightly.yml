@@ -1,0 +1,20 @@
+name: enrich-nightly
+on:
+  schedule:
+    - cron: "7 3 * * *"
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci || true
+      - name: Run enrichment script
+        env:
+          HUBSPOT_PRIVATE_APP_TOKEN: ${{ secrets.HUBSPOT_PRIVATE_APP_TOKEN }}
+          DYNAMICS_CLIENT_ID: ${{ secrets.DYNAMICS_CLIENT_ID }}
+          DYNAMICS_SECRET: ${{ secrets.DYNAMICS_SECRET }}
+        run: node scripts/hubspot-enrich.js
