@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-page-custom-font */
 // app/layout.tsx
 import { ReactNode } from "react";
 import ChatWidget from "./components/ChatWidget";

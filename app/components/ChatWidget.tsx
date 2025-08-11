@@ -20,9 +20,11 @@ export default function ChatWidget() {
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      setMessages([{ role: 'assistant', content: '¡Hola! ¿En qué puedo ayudarte hoy?' }]);
+      setMessages([
+        { role: 'assistant', content: '¡Hola! ¿En qué puedo ayudarte hoy?' },
+      ]);
     }
-  }, [isOpen]);
+  }, [isOpen, messages.length]);
 
   async function sendMessage() {
     if (!input.trim()) return;
@@ -59,7 +61,13 @@ export default function ChatWidget() {
         <div className="fixed bottom-4 right-4 w-80 bg-white shadow-lg rounded-lg flex flex-col z-50">
           <div className="p-2 border-b font-semibold bg-gray-100 flex justify-between items-center">
             <span>Simiriki AI</span>
-            <button onClick={() => setIsOpen(false)} className="text-gray-500">×</button>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-gray-500"
+              aria-label="Cerrar chat"
+            >
+              ×
+            </button>
           </div>
           <div
             ref={containerRef}
@@ -101,6 +109,7 @@ export default function ChatWidget() {
         <button
           className="fixed bottom-4 right-4 bg-blue-600 text-white rounded-full p-3 shadow-lg z-50"
           onClick={() => setIsOpen(true)}
+          aria-label="Abrir chat"
         >
           Chat
         </button>
