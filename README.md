@@ -27,4 +27,8 @@ This starter application uses Next.js and React Server Components. By default, a
 > **Note:** If you use the [Azure Static Web Apps CLI](https://docs.microsoft.com/azure/static-web-apps/local-development), copy the *staticwebapp.config.json* fil
 > e to the *out* folder, and start the CLI from the *out* folder.
 
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
 <!-- trigger deployment -->
