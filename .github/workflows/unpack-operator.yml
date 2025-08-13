@@ -1,0 +1,44 @@
+name: Unpack Simiriki Operator
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'ops/import/*.zip'
+
+permissions:
+  contents: write
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install unzip and rsync
+        run: sudo apt-get update && sudo apt-get install -y unzip rsync
+
+      - name: Unpack archive
+        run: |
+          set -e
+          if ! ls ops/import/*.zip >/dev/null 2>&1; then
+            echo "No zip found in ops/import"; exit 1
+          fi
+          ZIP=$(ls -t ops/import/*.zip | head -n1)
+          echo "Using archive: $ZIP"
+          mkdir -p .unpack_tmp
+          unzip -o "$ZIP" -d .unpack_tmp
+          rsync -a --delete --exclude '.git/' .unpack_tmp/ ./
+          rm -rf .unpack_tmp
+
+      - name: Commit changes
+        run: |
+          git config user.name "simiriki-operator-bot"
+          git config user.email "ops@simiriki.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "unpack: import Simiriki Growth Operator"
+            git push
+          else:
+            echo "No changes to commit."
