@@ -4,7 +4,20 @@ import { BlobServiceClient } from '@azure/storage-blob';
 const saName = process.env.STORAGE_ACCOUNT_NAME!;
 const saKey = process.env.STORAGE_ACCOUNT_KEY!;
 const container = process.env.STORAGE_CONTAINER!;
+const saName = process.env.STORAGE_ACCOUNT_NAME;
+const saKey = process.env.STORAGE_ACCOUNT_KEY;
+const container = process.env.STORAGE_CONTAINER;
 
+if (!saName || !saKey || !container) {
+  throw new Error(
+    'Missing required environment variables: ' +
+    [
+      !saName ? 'STORAGE_ACCOUNT_NAME' : null,
+      !saKey ? 'STORAGE_ACCOUNT_KEY' : null,
+      !container ? 'STORAGE_CONTAINER' : null
+    ].filter(Boolean).join(', ')
+  );
+}
 function blobClient() {
   const conn = `DefaultEndpointsProtocol=https;AccountName=${saName};AccountKey=${saKey};EndpointSuffix=core.windows.net`;
   return BlobServiceClient.fromConnectionString(conn);
