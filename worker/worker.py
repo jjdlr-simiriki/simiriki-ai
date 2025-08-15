@@ -94,7 +94,41 @@ def main():
                     traceback.print_exc()
                     update_status(job_id, status="failed", error=str(e), failedAt=datetime.utcnow().isoformat())
                     receiver.abandon_message(msg)
-        time.sleep(1)
+    shutdown_event = threading.Event()
+
+    def handle_signal(signum, frame):
+        print(f"Received signal {signum}, shutting down gracefully...")
+        shutdown_event.set()
+
+    signal.signal(signal.SIGINT, handle_signal)
+    signal.signal(signal.SIGTERM, handle_signal)
+
+    sb = ServiceBusClient.from_connection_string(SB_CONN)
+    receiver = sb.get_queue_receiver(queue_name=SB_QUEUE, max_wait_time=5)
+    print("Worker started. Listening for jobs...")
+    try:
+        while not shutdown_event.is_set():
+            with receiver:
+                for msg in receiver:
+                    job_id = (msg.application_properties or {}).get(b"jobId", b"").decode("utf-8")
+                    job_type = (msg.application_properties or {}).get(b"type", b"").decode("utf-8")
+                    try:
+                        update_status(job_id, status="running", startedAt=datetime.utcnow().isoformat(), jobType=job_type)
+                        body = msg.body
+                        if isinstance(body, (bytes, bytearray)):
+                            body = json.loads(body.decode("utf-8"))
+                        result = process_message(body, job_id)
+                        update_status(job_id, status="succeeded", completedAt=datetime.utcnow().isoformat(), result=result)
+                        receiver.complete_message(msg)
+                    except Exception as e:
+                        traceback.print_exc()
+                        update_status(job_id, status="failed", error=str(e), failedAt=datetime.utcnow().isoformat())
+                        receiver.abandon_message(msg)
+            time.sleep(1)
+    finally:
+        print("Cleaning up resources...")
+        receiver.close()
+        sb.close()
 
 if __name__ == "__main__":
     main()
