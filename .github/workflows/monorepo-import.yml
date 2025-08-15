@@ -1,0 +1,38 @@
+# .github/workflows/monorepo-import.yml
+name: Importar repos a monorepo
+
+on:
+  workflow_dispatch: # Se ejecuta al pulsar el botón “Run workflow” en GitHub
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout simiriki-ai
+        uses: actions/checkout@v3
+        with:
+          ref: main
+          fetch-depth: 0 # Necesario para git subtree
+
+      - name: Configurar Git
+        run: |
+          git config user.name "simiriki-bot"
+          git config user.email "bot@simiriki.com"
+
+      - name: Añadir repos remotos
+        run: |
+          git remote add landing https://github.com/jjdlr-simiriki/simiriki-landing.git
+          git remote add base44 https://github.com/jjdlr-simiriki/simiriki-base44-core.git
+          git fetch --all --tags
+
+      - name: Crear rama y añadir subtrees
+        run: |
+          git checkout -b chore/monorepo-merge
+          git subtree add --prefix=landing landing main
+          git subtree add --prefix=base44-core base44 main
+
+      - name: Empujar rama con PAT
+        env:
+          GH_PAT: ${{ secrets.PAT_PUSH }}
+        run: |
+          git push https://$GH_PAT@github.com/jjdlr-simiriki/simiriki-ai.git chore/monorepo-merge
