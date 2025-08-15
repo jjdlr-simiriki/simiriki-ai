@@ -8,7 +8,19 @@ const sbQueue = process.env.SERVICEBUS_QUEUE!;
 const saName = process.env.STORAGE_ACCOUNT_NAME!;
 const saKey = process.env.STORAGE_ACCOUNT_KEY!;
 const container = process.env.STORAGE_CONTAINER!;
+function getEnvVar(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
+}
 
+const sbConn = getEnvVar('SERVICEBUS_CONNECTION_STRING');
+const sbQueue = getEnvVar('SERVICEBUS_QUEUE');
+const saName = getEnvVar('STORAGE_ACCOUNT_NAME');
+const saKey = getEnvVar('STORAGE_ACCOUNT_KEY');
+const container = getEnvVar('STORAGE_CONTAINER');
 function blobClient() {
   const conn = `DefaultEndpointsProtocol=https;AccountName=${saName};AccountKey=${saKey};EndpointSuffix=core.windows.net`;
   return BlobServiceClient.fromConnectionString(conn);
