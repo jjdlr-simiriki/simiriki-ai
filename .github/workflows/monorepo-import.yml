@@ -6,13 +6,16 @@ on:
 
 jobs:
   import:
+    permissions:
+      contents: write  # habilita el push con el token interno
     runs-on: ubuntu-latest
     steps:
       - name: Checkout simiriki-ai
         uses: actions/checkout@v3
         with:
           ref: main
-          fetch-depth: 0 # Necesario para git subtree
+          fetch-depth: 0    # Necesario para git subtree
+          persist-credentials: false
 
       - name: Configurar Git
         run: |
@@ -31,8 +34,6 @@ jobs:
           git subtree add --prefix=landing landing main
           git subtree add --prefix=base44-core base44 main
 
-      - name: Empujar rama con PAT
-        env:
-          GH_PAT: ${{ secrets.PAT_PUSH }}
+      - name: Empujar rama
         run: |
-          git push https://$GH_PAT@github.com/jjdlr-simiriki/simiriki-ai.git chore/monorepo-merge
+          git push origin chore/monorepo-merge
