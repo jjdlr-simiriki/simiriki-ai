@@ -13,7 +13,22 @@ CONTAINER = os.environ.get("STORAGE_CONTAINER", "jobs")
 
 AZ_OAI_ENDPOINT = os.environ["AZURE_OPENAI_ENDPOINT"]
 AZ_OAI_KEY      = os.environ["AZURE_OPENAI_KEY"]
-AZ_OAI_DEPLOY   = os.environ["AZURE_OPENAI_DEPLOYMENT"]
+def get_required_env(var_name):
+    value = os.environ.get(var_name)
+    if value is None or value.strip() == "":
+        raise RuntimeError(f"Required environment variable '{var_name}' is missing or empty.")
+    return value
+
+# environment variables
+SB_CONN   = get_required_env("SERVICEBUS_CONNECTION_STRING")
+SB_QUEUE  = os.environ.get("SERVICEBUS_QUEUE", "simiriki-jobs")
+SA_NAME   = get_required_env("STORAGE_ACCOUNT_NAME")
+SA_KEY    = get_required_env("STORAGE_ACCOUNT_KEY")
+CONTAINER = os.environ.get("STORAGE_CONTAINER", "jobs")
+
+AZ_OAI_ENDPOINT = get_required_env("AZURE_OPENAI_ENDPOINT")
+AZ_OAI_KEY      = get_required_env("AZURE_OPENAI_KEY")
+AZ_OAI_DEPLOY   = get_required_env("AZURE_OPENAI_DEPLOYMENT")
 AZ_OAI_API_VER  = os.environ.get("AZURE_OPENAI_API_VERSION","2024-10-21")
 
 client = AzureOpenAI(api_key=AZ_OAI_KEY, api_version=AZ_OAI_API_VER, azure_endpoint=AZ_OAI_ENDPOINT)
