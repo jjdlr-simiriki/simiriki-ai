@@ -2,10 +2,12 @@
 name: Importar repos a monorepo
 
 on:
-  workflow_dispatch: # Se ejecuta al pulsar el botón “Run workflow” en GitHub
+  workflow_dispatch:
 
 jobs:
   import:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout simiriki-ai
@@ -13,16 +15,6 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-          token: ${{ secrets.PAT_PUSH }}  # usa tu PAT
-
-      # … los mismos pasos de configuración, fetch y subtree …
-
-      - name: Empujar rama
-        run: |
-          git push https://$GH_PAT@github.com/jjdlr-simiriki/simiriki-ai.git chore/monorepo-merge
-        env:
-          GH_PAT: ${{ secrets.PAT_PUSH }}
-
 
       - name: Configurar Git
         run: |
@@ -44,5 +36,3 @@ jobs:
       - name: Empujar rama
         run: |
           git push origin chore/monorepo-merge
-
-          
