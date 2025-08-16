@@ -15,7 +15,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 0    # Necesario para git subtree
-          persist-credentials: false
+          # Usamos GITHUB_TOKEN por defecto para autenticar push; no deshabilitar persist-credentials
 
       - name: Configurar Git
         run: |
