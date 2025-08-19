@@ -34,7 +34,7 @@ jobs:
         run: npm run build
 
       - name: Create deployment package
-        run: zip -r site.zip . -x ".git/*" ".github/*" "node_modules/*"
+        run: zip -r site.zip . -x ".git/* ".github/*" 
 
       - name: Azure Login via OIDC
         uses: azure/login@v2
@@ -45,4 +45,4 @@ jobs:
 
       - name: Deploy to Azure Web App
         run: |
-          az webapp deploy --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_WEBAPP_NAME --src-path site.zip
+          
