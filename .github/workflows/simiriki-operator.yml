@@ -1,0 +1,134 @@
+name: simiriki-operator
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: What to do
+        required: true
+        default: bootstrap-email
+        type: choice
+        options: [bootstrap-email, send-test]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  DOMAIN: ${{ vars.DOMAIN }}
+  RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
+  DNS_ZONE: ${{ vars.DNS_ZONE }}
+  CONTACT_UPN: contacto@${{ vars.DOMAIN }}
+  CONTACT_NAME: "Contacto Simiriki"
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure jq is available
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Bootstrap Email (DNS + Graph + User)
+        if: ${{ github.event.inputs.action == 'bootstrap-email' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "==> Fetch domain verification record from Graph"
+          az rest --method POST --url "https://graph.microsoft.com/v1.0/domains" \
+            --headers "Content-Type=application/json" \
+            --body "{\"id\":\"${DOMAIN}\"}" >/dev/null 2>&1 || true
+
+          az rest --method GET --url "https://graph.microsoft.com/v1.0/domains/${DOMAIN}/verificationDnsRecords" \
+            | tee verify.json >/dev/null
+          TXT_VALUE=$(jq -r '.value[] | select(.recordType=="txt") | .text' verify.json | head -n1)
+          if [ -z "$TXT_VALUE" ] ; then
+            echo "Could not acquire TXT verification value from Graph."; exit 1
+          fi
+          echo "TXT verification value: $TXT_VALUE"
+
+          echo "==> Publish TXT + SPF + Autodiscover"
+          az network dns record-set txt create -g "${RESOURCE_GROUP}" -z "${DNS_ZONE}" -n "@" --ttl 300 >/dev/null 2>&1 || true
+          az network dns record-set txt add-record -g "${RESOURCE_GROUP}" -z "${DNS_ZONE}" -n "@" --value "$TXT_VALUE" >/dev/null 2>&1 || true
+          az network dns record-set txt add-record -g "${RESOURCE_GROUP}" -z "${DNS_ZONE}" -n "@" --value "v=spf1 include:spf.protection.outlook.com -all" >/dev/null 2>&1 || true
+          az network dns record-set cname set-record -g "${RESOURCE_GROUP}" -z "${DNS_ZONE}" -n "autodiscover" -c "autodiscover.outlook.com"
+
+          echo "==> Verify domain in M365"
+          az rest --method POST --url "https://graph.microsoft.com/v1.0/domains/${DOMAIN}/verify" >/dev/null || true
+
+          echo "==> Choose an available license with Exchange"
+          SKU_ID=$(az rest --method GET --url "https://graph.microsoft.com/v1.0/subscribedSkus" \
+            | jq -r '.value[]
+               | select((.prepaidUnits.enabled - .consumedUnits) > 0)
+               | select(.skuPartNumber | test("BUSINESS|STANDARD|ENTERPRISE"; "i"))
+               | .skuId' | head -n1)
+          if [ -z "$SKU_ID" ]; then
+            echo "No suitable license with remaining seats found. Assign one manually, then re-run."; exit 1
+          fi
+
+          TEMP_PASS="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 12)!Aa1"
+
+          echo "==> Create user ${CONTACT_UPN}"
+          az rest --method POST --url "https://graph.microsoft.com/v1.0/users" \
+            --headers "Content-Type=application/json" \
+            --body "{
+              \"accountEnabled\": true,
+              \"displayName\": \"${CONTACT_NAME}\",
+              \"mailNickname\": \"contacto\",
+              \"userPrincipalName\": \"${CONTACT_UPN}\",
+              \"passwordProfile\": {\"forceChangePasswordNextSignIn\": true, \"password\": \"${TEMP_PASS}\"}
+            }" >/dev/null || true
+
+          echo "==> Assign license ${SKU_ID}"
+          az rest --method POST --url "https://graph.microsoft.com/v1.0/users/${CONTACT_UPN}/assignLicense" \
+            --headers "Content-Type=application/json" \
+            --body "{\"addLicenses\":[{\"skuId\":\"${SKU_ID}\"}],\"removeLicenses\":[]}" >/dev/null
+
+          echo "TEMP PASSWORD (store safely): ${TEMP_PASS}"
+
+          echo "==> Set MX to Microsoft 365"
+          MX_HOST="$(echo "${DOMAIN}" | tr '.' '-' ).mail.protection.outlook.com"
+          az network dns record-set mx create -g "${RESOURCE_GROUP}" -z "${DNS_ZONE}" -n "@" --ttl 300 >/dev/null 2>&1 || true
+          az network dns record-set mx add-record -g "${RESOURCE_GROUP}" -z "${DNS_ZONE}" -n "@" --preference 0 --exchange "${MX_HOST}" >/dev/null 2>&1 || true
+
+          echo "==> DMARC (basic)"
+          az network dns record-set txt create -g "${RESOURCE_GROUP}" -z "${DNS_ZONE}" -n "_dmarc" --ttl 300 >/dev/null 2>&1 || true
+          az network dns record-set txt add-record -g "${RESOURCE_GROUP}" -z "${DNS_ZONE}" -n "_dmarc" \
+            --value "v=DMARC1; p=quarantine; rua=mailto:dmarc@${DOMAIN}; ruf=mailto:dmarc@${DOMAIN}; fo=1" >/dev/null 2>&1 || true
+
+          echo "==> Send test email via Graph (app-only)"
+          TO="${{ github.actor }}@users.noreply.github.com"
+          az rest --method POST --url "https://graph.microsoft.com/v1.0/users/${CONTACT_UPN}/sendMail" \
+            --headers "Content-Type=application/json" \
+            --body "{
+              \"message\": {
+                \"subject\": \"Simiriki is live — test from ${CONTACT_UPN}\",
+                \"body\": {\"contentType\": \"Text\", \"content\": \"Hola. Email rail is up. Time to chase grants & loans.\"},
+                \"toRecipients\": [{\"emailAddress\": {\"address\": \"${TO}\"}}]
+              },
+              \"saveToSentItems\": true
+            }" || echo "SendMail attempted. If it fails on first run, wait for mailbox provisioning and re-run."
+
+      - name: Send Test Only
+        if: ${{ github.event.inputs.action == 'send-test' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TO="${{ github.actor }}@users.noreply.github.com"
+          az rest --method POST --url "https://graph.microsoft.com/v1.0/users/${CONTACT_UPN}/sendMail" \
+            --headers "Content-Type=application/json" \
+            --body "{
+              \"message\": {
+                \"subject\": \"Simiriki operator — test send\",
+                \"body\": {\"contentType\": \"Text\", \"content\": \"Testing Mail.Send via app-only.\"},
+                \"toRecipients\": [{\"emailAddress\": {\"address\": \"${TO}\"}}]
+              },
+              \"saveToSentItems\": true
+            }"
