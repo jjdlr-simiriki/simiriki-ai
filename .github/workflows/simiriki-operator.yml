@@ -33,7 +33,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Ensure jq is available
+      - name: Ensure jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Bootstrap Email (DNS + Graph + User)
@@ -49,9 +49,7 @@ jobs:
           az rest --method GET --url "https://graph.microsoft.com/v1.0/domains/${DOMAIN}/verificationDnsRecords" \
             | tee verify.json >/dev/null
           TXT_VALUE=$(jq -r '.value[] | select(.recordType=="txt") | .text' verify.json | head -n1)
-          if [ -z "$TXT_VALUE" ] ; then
-            echo "Could not acquire TXT verification value from Graph."; exit 1
-          fi
+          if [ -z "$TXT_VALUE" ]; then echo "No TXT from Graph"; exit 1; fi
           echo "TXT verification value: $TXT_VALUE"
 
           echo "==> Publish TXT + SPF + Autodiscover"
@@ -63,15 +61,10 @@ jobs:
           echo "==> Verify domain in M365"
           az rest --method POST --url "https://graph.microsoft.com/v1.0/domains/${DOMAIN}/verify" >/dev/null || true
 
-          echo "==> Choose an available license with Exchange"
+          echo "==> Choose an available license"
           SKU_ID=$(az rest --method GET --url "https://graph.microsoft.com/v1.0/subscribedSkus" \
-            | jq -r '.value[]
-               | select((.prepaidUnits.enabled - .consumedUnits) > 0)
-               | select(.skuPartNumber | test("BUSINESS|STANDARD|ENTERPRISE"; "i"))
-               | .skuId' | head -n1)
-          if [ -z "$SKU_ID" ]; then
-            echo "No suitable license with remaining seats found. Assign one manually, then re-run."; exit 1
-          fi
+            | jq -r '.value[] | select((.prepaidUnits.enabled - .consumedUnits) > 0) | select(.skuPartNumber | test("BUSINESS|STANDARD|ENTERPRISE";"i")) | .skuId' | head -n1)
+          if [ -z "$SKU_ID" ]; then echo "No license available"; exit 1; fi
 
           TEMP_PASS="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 12)!Aa1"
 
@@ -114,7 +107,7 @@ jobs:
                 \"toRecipients\": [{\"emailAddress\": {\"address\": \"${TO}\"}}]
               },
               \"saveToSentItems\": true
-            }" || echo "SendMail attempted. If it fails on first run, wait for mailbox provisioning and re-run."
+            }" || echo "SendMail attempted. If it fails on first run, wait a few minutes and re-run."
 
       - name: Send Test Only
         if: ${{ github.event.inputs.action == 'send-test' }}
