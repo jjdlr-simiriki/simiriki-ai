@@ -9,7 +9,6 @@
     "export": "next build && next export",
     "start": "next start",
     "lint": "next lint",
-    "test": "npm run lint"
   },
   "dependencies": {
     "next": "^15.4.6",
