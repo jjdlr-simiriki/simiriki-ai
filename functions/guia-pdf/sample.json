@@ -1,0 +1,19 @@
+{
+  "name": "Carlos López",
+  "company": "Grupo Aurora",
+  "email": "carlos@aurora.com",
+  "date": "25/08/2025",
+  "offer_hint": "Desde MXN $2,490 — Diagnóstico + Plan 90 días",
+  "links": {
+    "checkout": "https://buy.stripe.com/test_123456",
+    "booking": "https://book.ms/abc123"
+  },
+  "answers": {
+    "has_crm": false,
+    "billing": "manual",
+    "marketing_channels": ["ads"],
+    "support_channels": ["WhatsApp"],
+    "uses_analytics": false,
+    "lead_capture": "landing"
+  }
+}
