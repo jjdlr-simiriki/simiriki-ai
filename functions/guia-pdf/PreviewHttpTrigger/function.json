@@ -1,0 +1,7 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    { "authLevel": "Function", "type": "httpTrigger", "direction": "in", "name": "req", "methods": [ "get" ], "route": "guia/preview" },
+    { "type": "http", "direction": "out", "name": "$return" }
+  ]
+}
