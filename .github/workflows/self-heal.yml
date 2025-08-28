@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download Lighthouse JSON artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v5
         with:
           name: lhr-report
           path: lhr/
