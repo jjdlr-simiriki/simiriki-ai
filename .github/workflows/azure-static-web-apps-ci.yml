@@ -1,4 +1,5 @@
 on:
+
   push:
     branches:
       - main
@@ -15,3 +16,11 @@ on:
       - 'next.config.mjs'
       - 'package.json'
       - 'tsconfig.json'
+
+jobs:
+
+        noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip job
+        run: echo "No static web app build"
