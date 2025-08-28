@@ -1,2 +1,24 @@
-on: {push: {branches: [main], paths: ['app/**','next.config.mjs','package.json','tsconfig.json']}, pull_request: {branches: [main], paths: ['app/**','next.config.mjs','package.json','tsconfig.json']}}
-jobs: {noop: {runs-on: ubuntu-latest, steps: [{run: echo skip}]}}
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "app/**"
+      - "next.config.mjs"
+      - "package.json"
+      - "tsconfig.json"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "app/**"
+      - "next.config.mjs"
+      - "package.json"
+      - "tsconfig.json"
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip job
+        run: echo "No static web app build"
